@@ -57,10 +57,10 @@ sub parse_data_record($)
 #USC00118740190208TMAX  300  6  322  6  322  6  256  6  289  6  250  6  272  6  289  6  267  6  267  6  222  6  261  6  278  6  222  6  228  6  261  6  233  6  239  6  294  6  306  6  272  6  211  6  211  6  250  6  267  6  267  6  294  6  300  6  294  6  306  6  289  6
 
 	my $record=shift;
-	my $station_id	= ghcn_substr($record, 1,11); trim($station_id);
-	my $year	= ghcn_substr($record,12,15); trim($year);
-	my $month	= ghcn_substr($record,16,17); trim($month);
-	my $element	= ghcn_substr($record,18,21); trim($element);
+	my $station_id	= trim(ghcn_substr($record, 1,11));
+	my $year	= trim(ghcn_substr($record,12,15));
+	my $month	= trim(ghcn_substr($record,16,17));
+	my $element	= trim(ghcn_substr($record,18,21));
 	my %entries;
 
 	my $base=21;
@@ -68,7 +68,7 @@ sub parse_data_record($)
 	for (my $i=01; $i<=31; $i++)
 	{
 		my $index = $base+($i-1)*$entry_length;
-		my $value = substr($record, $index,   5); trim($value);
+		my $value = trim(substr($record, $index, 5));
 		$entries{$i} = {	'value' => $value,
 					'mflag' => substr($record, $index+5, 1),
 					'qflag' => substr($record, $index+6, 1),
