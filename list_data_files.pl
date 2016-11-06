@@ -199,7 +199,15 @@ foreach my $data_file (values %selected_data_filenames)
 	{
 		my ($id, $entries) = parse_data_record($record);
 		next unless (substr(uc($$entries{'element'}),0,2) eq "AC");
-		print Dumper($id,$entries);
+		my $year = $$entries{'year'};
+		my $month = $$entries{'month'};
+		my @cloud_coverage;
+		for my $index (1..31)
+		{
+			my $cloudvalue = $$entries{'entries'}{$index}{'value'};
+			push(@cloud_coverage, $cloudvalue) unless ($cloudvalue==-9999);
+		}
+		print "id $id year $year month $month pct_cloudy ", join(',', @cloud_coverage), "\n";
 	}
 	close(DATA);
 }
