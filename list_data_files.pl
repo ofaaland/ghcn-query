@@ -54,7 +54,7 @@ sub parse_station($)
 #	print "station_name   $station_name\n";
 
 	return ($station_id,
-		{"state"=>$state, "country"=>$country, "station_name"=>$station_name});
+		{"state"=>$state, "country"=>$country, "station_id"=>$station_id, "station_name"=>$station_name});
 }
 
 sub get_data_filenames($)
