@@ -15,6 +15,14 @@ sub usage()
 my %query;
 my %stations;
 my %data_filenames;
+
+sub trim
+{
+	my $s = shift;
+	$s =~ s/^\s+|\s+$//g;
+	return $s
+};
+
 sub parse_args()
 {
 	foreach my $clause (@ARGV) {
@@ -25,6 +33,51 @@ sub parse_args()
 		}
 		$query{$parts[0]}=$parts[1];
 	}
+}
+
+# translate from (start column, end column) semantics
+# to (start column, character count) semantics
+# where column numbers given are 1-based, but
+# substr() takes 0-based column numbers
+#
+# The ghcn readme.txt uses the (start,end) description method.
+# This also makes it easy to see if a column is missed or used twice
+sub ghcn_substr($$$)
+{
+	my $record = shift;
+	my $startcol = shift;
+	my $endcol = shift;
+	return substr($record, $startcol-1, ($endcol-$startcol+1));
+}
+
+sub parse_data_record($)
+{
+# fields are fixed-width
+# see readme.txt for specification
+#USC00118740190208TMAX  300  6  322  6  322  6  256  6  289  6  250  6  272  6  289  6  267  6  267  6  222  6  261  6  278  6  222  6  228  6  261  6  233  6  239  6  294  6  306  6  272  6  211  6  211  6  250  6  267  6  267  6  294  6  300  6  294  6  306  6  289  6
+
+	my $record=shift;
+	my $station_id	= ghcn_substr($record, 1,11); trim($station_id);
+	my $year	= ghcn_substr($record,12,15); trim($year);
+	my $month	= ghcn_substr($record,16,17); trim($month);
+	my $element	= ghcn_substr($record,18,21); trim($element);
+	my %entries;
+
+	my $base=21;
+	my $entry_length=8;
+	for (my $i=01; $i<=31; $i++)
+	{
+		my $index = $base+($i-1)*$entry_length;
+		my $value = substr($record, $index,   5); trim($value);
+		$entries{$i} = {	'value' => $value,
+					'mflag' => substr($record, $index+5, 1),
+					'qflag' => substr($record, $index+6, 1),
+					'sflag' => substr($record, $index+7, 1)};
+	}
+	return ($station_id, {	'year' => $year,
+				'month' => $month,
+				'element' => $element,
+				'entries' => \%entries });
 }
 
 sub parse_station($)
@@ -142,5 +195,15 @@ my %selected_data_filenames = filter_by_keys(\%data_filenames,[keys %selected_st
 #print Dumper(\%stations);
 #print Dumper(\%selected_stations);
 #print Dumper(\%data_filenames);
-print Dumper(\%selected_data_filenames);
+#print Dumper(\%selected_data_filenames);
+#print Dumper(parse_data_record('USC00118740190208TMAX  300  6  322  6  322  6  256  6  289  6  250  6  272  6  289  6  267  6  267  6  222  6  261  6  278  6  222  6  228  6  261  6  233  6  239  6  294  6  306  6  272  6  211  6  211  6  250  6  267  6  267  6  294  6  300  6  294  6  306  6  289  6'));
 
+foreach my $data_file (values %selected_data_filenames)
+{
+	open(DATA, "$data_file_path/$data_file") || die "failed to open $data_file: $!";
+	while (my $record = <DATA>)
+	{
+		print Dumper(parse_data_record($record));
+	}
+	close(DATA);
+}
