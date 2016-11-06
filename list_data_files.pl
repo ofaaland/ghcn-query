@@ -126,6 +126,8 @@ if (@ARGV<1) {
 	usage();
 }
 
+$Data::Dumper::Sortkeys = 1;
+
 parse_args();
 print "Query is: ";
 print Dumper(\%query);
