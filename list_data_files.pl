@@ -197,7 +197,9 @@ foreach my $data_file (values %selected_data_filenames)
 	open(DATA, "$data_file_path/$data_file") || die "failed to open $data_file: $!";
 	while (my $record = <DATA>)
 	{
-		print Dumper(parse_data_record($record));
+		my ($id, $entries) = parse_data_record($record);
+		next unless (substr(uc($$entries{'element'}),0,2) eq "AC");
+		print Dumper($id,$entries);
 	}
 	close(DATA);
 }
