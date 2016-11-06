@@ -40,3 +40,5 @@ sub test
 		print "\n";
 	}
 }
+
+1;

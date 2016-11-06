@@ -2,6 +2,7 @@
 
 use strict;
 use Data::Dumper;
+require "variance.pl";
 
 my $data_file_path="../ghcnd_hcn/";
 my $station_file_path="../ghcnd-stations.txt";
@@ -195,7 +196,8 @@ foreach my $data_file (values %selected_data_filenames)
 	while (my $record = <DATA>)
 	{
 		my ($id, $entries) = parse_data_record($record);
-		next unless (substr(uc($$entries{'element'}),0,2) eq "AC");
+		my $element = $$entries{'element'};
+		next unless (substr(uc($element),0,2) eq "AC");
 		my $year = $$entries{'year'};
 		my $month = $$entries{'month'};
 		my @cloud_coverage;
@@ -204,7 +206,11 @@ foreach my $data_file (values %selected_data_filenames)
 			my $cloudvalue = $$entries{'entries'}{$index}{'value'};
 			push(@cloud_coverage, $cloudvalue) unless ($cloudvalue==-9999);
 		}
-		print "id $id year $year month $month pct_cloudy ", join(',', @cloud_coverage), "\n";
+		my ($count,$sum,$sumsqr) = count_sum_sqr(@cloud_coverage);
+		printf("id %s element %s year %d month %d pct_cloudy mean %2d stdev %2d\n",
+			$id, $element, $year, $month, $sum/$count,
+			sqrt(variance($count,$sum,$sumsqr)));
+		#, join(',', @cloud_coverage), "\n";
 	}
 	close(DATA);
 }
