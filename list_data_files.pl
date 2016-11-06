@@ -176,9 +176,6 @@ if (@ARGV<1) {
 $Data::Dumper::Sortkeys = 1;
 
 parse_args();
-print "Query is: ";
-print Dumper(\%query);
-
 get_data_filenames($data_file_path);
 read_stations($station_file_path);
 my %selected_stations = filter_stations();
