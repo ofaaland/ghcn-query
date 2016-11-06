@@ -89,19 +89,13 @@ sub parse_station($)
 # fields are fixed-width
 # First field is ID; United States stations start with US
 	my $record=shift;
-	my $station_id = substr($record,0,11);
-	chomp($station_id);
+	my $station_id = trim(substr($record,0,11));
+	my $country = trim(substr($station_id,0,2));
 
-	my $country = substr($station_id,0,2);
-	chomp($country);
+	return unless (uc($country) eq 'US');
 
-	return unless ($country eq 'US');
-
-	my $state = substr($record,38,2);
-	chomp($state);
-
-	my $station_name = substr($record,41,(81-42));
-	chomp($station_name);
+	my $state = trim(substr($record,38,2));
+	my $station_name = trim(substr($record,41,(81-42)));
 
 #	print "record         $record\n";
 #	print "station_id     $station_id\n";
