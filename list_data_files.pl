@@ -3,6 +3,9 @@
 use strict;
 use Data::Dumper;
 
+my $data_file_path="../ghcnd_hcn/";
+my $station_file_path="../ghcnd-stations.txt";
+
 sub usage()
 {
 	print "$0 key1=value1 [key2=value2 [key3=value3 ...]]\n";
@@ -127,8 +130,8 @@ parse_args();
 print "Query is: ";
 print Dumper(\%query);
 
-get_data_filenames("../ghcnd_hcn/");
-read_stations("../ghcnd-stations.txt");
+get_data_filenames($data_file_path);
+read_stations($station_file_path);
 my %selected_stations = filter_stations();
 my %selected_data_filenames = filter_by_keys(\%data_filenames,[keys %selected_stations]);
 
