@@ -201,14 +201,17 @@ foreach my $data_file (values %selected_data_filenames)
 		my $year = $$entries{'year'};
 		my $month = $$entries{'month'};
 		my @cloud_coverage;
+		my $station_name = substr($stations{$id}{'station_name'},0,20);
+		$station_name =~ s/  */_/g;
+		#print Dumper($stations{$id});
 		for my $index (1..31)
 		{
 			my $cloudvalue = $$entries{'entries'}{$index}{'value'};
 			push(@cloud_coverage, $cloudvalue) unless ($cloudvalue==-9999);
 		}
 		my ($count,$sum,$sumsqr) = count_sum_sqr(@cloud_coverage);
-		printf("id %s element %s year %d month %d pct_cloudy mean %2d stdev %2d\n",
-			$id, $element, $year, $month, $sum/$count,
+		printf("id %s name %s element %s year %d month %d pct_cloudy mean %2d stdev %2d\n",
+			$id, $station_name, $element, $year, $month, $sum/$count,
 			sqrt(variance($count,$sum,$sumsqr)));
 		#, join(',', @cloud_coverage), "\n";
 	}
