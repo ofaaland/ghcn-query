@@ -192,12 +192,18 @@ my %selected_data_filenames = filter_by_keys(\%data_filenames,[keys %selected_st
 
 foreach my $data_file (values %selected_data_filenames)
 {
+	my $cloudiness_records = 0;
 	open(DATA, "$data_file_path/$data_file") || die "failed to open $data_file: $!";
 	while (my $record = <DATA>)
 	{
 		my ($id, $entries) = parse_data_record($record);
 		my $element = $$entries{'element'};
-		next unless (substr(uc($element),0,2) eq "AC");
+		if (! substr(uc($element),0,2) eq "AC")
+		{
+			next;
+		} else {
+			$cloudiness_records += 1;
+		}
 		my $year = $$entries{'year'};
 		my $month = $$entries{'month'};
 		my @cloud_coverage;
@@ -207,7 +213,7 @@ foreach my $data_file (values %selected_data_filenames)
 		for my $index (1..31)
 		{
 			my $cloudvalue = $$entries{'entries'}{$index}{'value'};
-			push(@cloud_coverage, $cloudvalue) unless ($cloudvalue==-9999);
+			push(@cloud_coverage, $cloudvalue) unless ($cloudvalue == -9999);
 		}
 		my ($count,$sum,$sumsqr) = count_sum_sqr(@cloud_coverage);
 		printf("id %s name %s element %s year %d month %d pct_cloudy mean %2d stdev %2d\n",
@@ -216,4 +222,5 @@ foreach my $data_file (values %selected_data_filenames)
 		#, join(',', @cloud_coverage), "\n";
 	}
 	close(DATA);
+	print "$data_file ... cloudiness_records: $cloudiness_records\n";
 }
