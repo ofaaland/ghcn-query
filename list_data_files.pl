@@ -198,7 +198,7 @@ foreach my $data_file (values %selected_data_filenames)
 	{
 		my ($id, $entries) = parse_data_record($record);
 		my $element = $$entries{'element'};
-		if (! substr(uc($element),0,2) eq "AC")
+		if (! (substr(uc($element),0,2) eq "AC"))
 		{
 			next;
 		} else {
