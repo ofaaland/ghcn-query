@@ -20,7 +20,12 @@ sub variance
 	my $sum = shift;
 	my $sumsqr = shift;
 
-	return ($sumsqr-$sum*$sum/$count)/($count-1);
+	if ($count==1)
+	{
+		return 0;
+	} else {
+		return ($sumsqr-$sum*$sum/$count)/($count-1);
+	}
 }
 
 sub test
